@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Times Now - Modern Digital Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#D32027',
+                            dark: '#A5161C',
+                            light: '#FEF2F2',
+                            zoom: '#E11D48' // Zoom Entertainment pinkish red
+                        },
+                        ui: {
+                            bg: '#F8FAFC',
+                            card: '#FFFFFF',
+                            text: '#0F172A',
+                            muted: '#64748B',
+                            border: '#E2E8F0'
+                        },
+                        paper: {
+                            DEFAULT: '#FAF8F5',
+                            ink: '#1A1614'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'float': '0 10px 30px -5px rgba(0, 0, 0, 0.08)',
+                    },
+                    animation: {
+                        'marquee': 'marquee 35s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC;
+            color: #0F172A;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        ::selection { background: #D32027; color: #FFFFFF; }
+
+        @keyframes livePulse {
+            0% { box-shadow: 0 0 0 0 rgba(211, 32, 39, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(211, 32, 39, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(211, 32, 39, 0); }
+        }
+        .live-indicator { animation: livePulse 2s infinite; }
+
+        .newspaper-section {
+            background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.03%22/%3E%3C/svg%3E');
+        }
+        .drop-cap::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 800;
+            float: left;
+            line-height: 0.8;
+            padding-right: 0.5rem;
+            padding-top: 0.2rem;
+            color: #1A1614;
+        }
+        
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            bottom: 0;
+            left: 11px;
+            width: 2px;
+            background-color: #E2E8F0;
+            z-index: 0;
+        }
+
+        .clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+        .clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+
+        @keyframes stampPress {
+            0% { opacity: 0; transform: scale(1.5) rotate(-10deg); }
+            50% { opacity: 1; transform: scale(0.9) rotate(5deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .animate-stamp {
+            animation: stampPress 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        
+        @keyframes inkSpread {
+            0% { background-size: 0% 100%; }
+            100% { background-size: 100% 100%; }
+        }
+        .hover-ink-fill:hover {
+            background-image: linear-gradient(#1A1614, #1A1614);
+            background-repeat: no-repeat;
+            animation: inkSpread 0.4s ease-out forwards;
+            color: #FAF8F5;
+        }
+
+        /* Vintage coupon border */
+        .coupon-border {
+            background-image: radial-gradient(circle at 10px 10px, transparent 12px, #1A1614 13px);
+            background-size: 30px 30px;
+            background-position: -10px -10px;
+            padding: 4px;
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- Top Breaking News Marquee -->
+    <div class="bg-brand-red text-white text-xs py-1.5 flex items-center relative overflow-hidden border-b border-brand-dark">
+        <div class="bg-brand-dark px-4 py-1.5 font-bold uppercase tracking-wider z-10 absolute left-0 top-0 bottom-0 flex items-center shadow-[4px_0_10px_rgba(0,0,0,0.2)]">
+            <span class="live-indicator w-1.5 h-1.5 bg-white rounded-full mr-2"></span> Breaking
+        </div>
+        <div class="pl-32 flex whitespace-nowrap overflow-hidden w-full">
+            <div class="animate-marquee inline-block font-medium">
+                <span class="mx-6 hover:underline cursor-pointer">Sensex crosses 85K mark amidst heavy tech rally; Nifty at all-time high</span> •
+                <span class="mx-6 hover:underline cursor-pointer">PM Modi addresses the UN General Assembly, focuses on digital public infrastructure</span> •
+                <span class="mx-6 hover:underline cursor-pointer">Heavy rainfall alert issued for Mumbai and coastal Maharashtra for next 48 hours</span> •
+                <span class="mx-6 hover:underline cursor-pointer">ISRO confirms successful orbit insertion for latest earth observation satellite</span> •
+                <span class="mx-6 hover:underline cursor-pointer">Champions Trophy: India announces 15-member squad, Kohli to return</span>
+            </div>
+            <!-- Duplicate for seamless looping -->
+            <div class="animate-marquee inline-block font-medium" aria-hidden="true">
+                <span class="mx-6 hover:underline cursor-pointer">Sensex crosses 85K mark amidst heavy tech rally; Nifty at all-time high</span> •
+                <span class="mx-6 hover:underline cursor-pointer">PM Modi addresses the UN General Assembly, focuses on digital public infrastructure</span> •
+                <span class="mx-6 hover:underline cursor-pointer">Heavy rainfall alert issued for Mumbai and coastal Maharashtra for next 48 hours</span> •
+                <span class="mx-6 hover:underline cursor-pointer">ISRO confirms successful orbit insertion for latest earth observation satellite</span> •
+                <span class="mx-6 hover:underline cursor-pointer">Champions Trophy: India announces 15-member squad, Kohli to return</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <header class="bg-white border-b border-ui-border sticky top-0 z-50 shadow-sm">
+        <div class="max-w-[1440px] mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <!-- Left: Logo & Network -->
+                <div class="flex items-center space-x-6">
+                    <a href="#" class="font-bold text-3xl sm:text-4xl tracking-tighter text-ui-text flex items-center">
+                        TIMES<span class="text-brand-red">NOW</span>
+                    </a>
+                    <div class="hidden lg:flex items-center space-x-3 text-xs font-medium text-ui-muted border-l border-ui-border pl-4">
+                        <a href="#" class="hover:text-brand-red transition-colors">ET NOW</a>
+                        <a href="#" class="hover:text-brand-red transition-colors">Mirror NOW</a>
+                        <a href="#" class="hover:text-brand-red transition-colors">Zoom</a>
+                    </div>
+                </div>
+
+                <!-- Center: Main Nav Links -->
+                <nav class="hidden xl:flex space-x-6 text-sm font-bold text-ui-text">
+                    <a href="#" class="text-brand-red">Home</a>
+                    <a href="#" class="hover:text-brand-red transition-colors">India</a>
+                    <a href="#" class="hover:text-brand-red transition-colors">World</a>
+                    <a href="#" class="hover:text-brand-red transition-colors">Business</a>
+                    <a href="#" class="hover:text-brand-red transition-colors">Tech</a>
+                    <a href="#" class="hover:text-brand-red transition-colors">Sports</a>
+                    <a href="#" class="hover:text-brand-red transition-colors">Entertainment</a>
+                    <a href="#" class="hover:text-brand-red transition-colors"><i class="fas fa-gamepad mr-1 text-ui-muted"></i>Games</a>
+                </nav>
+
+                <!-- Right: Utilities, Live TV & Sign In -->
+                <div class="flex items-center space-x-4">
+                    <button class="w-9 h-9 rounded-full bg-ui-bg text-ui-text hover:bg-ui-border flex items-center justify-center transition-colors">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <!-- Live TV Button -->
+                    <a href="#" class="hidden sm:flex items-center bg-ui-text text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-black transition-colors shadow-soft">
+                        <div class="w-2 h-2 rounded-full bg-brand-red live-indicator mr-2"></div>
+                        Live TV
+                    </a>
+                    <!-- Sign In / Subscribe (Replaced Profile) -->
+                    <div class="flex items-center space-x-3 pl-4 border-l border-ui-border">
+                        <a href="#" class="text-sm font-bold text-ui-text hover:text-brand-red hidden md:block">Sign In</a>
+                        <a href="#" class="bg-brand-red/10 text-brand-red border border-brand-red/20 px-4 py-1.5 rounded-full text-sm font-bold hover:bg-brand-red hover:text-white transition-all">Subscribe</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 space-y-12">
+        
+        <!-- TOP STORIES: Hero Grid -->
+        <section>
+            <div class="flex items-center justify-between mb-4 border-b-2 border-ui-text pb-2">
+                <h2 class="text-2xl font-black text-ui-text tracking-tight uppercase">Top Stories</h2>
+                <div class="text-xs font-medium text-ui-muted flex items-center">
+                    <i class="fas fa-clock mr-1.5"></i> Updated just now
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Lead Story (Left - 8 cols) -->
+                <article class="lg:col-span-8 group cursor-pointer">
+                    <div class="relative rounded-2xl overflow-hidden mb-4 aspect-video bg-ui-border shadow-soft">
+                        <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Lead Story" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://placehold.co/1200x675/e2e8f0/0f172a?text=Breaking+News'">
+                        <!-- Fact Check / Trust Indicator -->
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-ui-text text-xs font-bold px-3 py-1.5 rounded-full flex items-center shadow-sm border border-ui-border">
+                            <i class="fas fa-shield-check text-green-600 mr-1.5"></i> Verified Report
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="md:w-2/3">
+                            <span class="text-brand-red font-bold text-xs uppercase tracking-wider mb-2 block">National Politics</span>
+                            <h1 id="lead-headline" class="font-serif font-black text-3xl sm:text-4xl leading-tight mb-3 text-ui-text group-hover:text-brand-red transition-colors">
+                                Historic Consensus Reached on Digital Data Privacy Framework Ahead of Winter Session
+                            </h1>
+                            <p class="text-ui-muted text-base leading-relaxed mb-4">
+                                In a rare show of unity, the joint parliamentary committee has cleared the revised draft of the comprehensive data protection bill, focusing heavily on localized storage and user consent mandates for tech giants.
+                            </p>
+                            <div class="text-xs text-ui-muted font-medium flex items-center space-x-3">
+                                <span>By Special Correspondent</span>
+                                <span>•</span>
+                                <span>4 min read</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Editorial "Quick Read" (With Gemini API) -->
+                        <div class="md:w-1/3 bg-ui-bg border border-ui-border rounded-xl p-4 flex flex-col">
+                            <div class="flex items-center justify-between mb-3 border-b border-ui-border pb-2">
+                                <h4 class="text-xs font-bold text-ui-text uppercase tracking-wide">Key Takeaways</h4>
+                                <button id="generate-summary-btn" class="bg-ui-text text-white text-[10px] font-bold px-2 py-1 rounded hover:bg-brand-red transition-colors flex items-center shadow-sm">
+                                    <i class="fas fa-sparkles mr-1.5 text-yellow-300"></i> AI Update
+                                </button>
+                            </div>
+                            <ul id="ai-summary-list" class="space-y-3 text-sm text-ui-text font-medium flex-grow">
+                                <li class="flex items-start"><div class="w-1.5 h-1.5 bg-brand-red rounded-full mt-1.5 mr-2 shrink-0"></div> Strict penalties proposed for data breaches.</li>
+                                <li class="flex items-start"><div class="w-1.5 h-1.5 bg-brand-red rounded-full mt-1.5 mr-2 shrink-0"></div> Exemption clauses for national security tightened.</li>
+                                <li class="flex items-start"><div class="w-1.5 h-1.5 bg-brand-red rounded-full mt-1.5 mr-2 shrink-0"></div> Bill likely to be tabled in the first week of December.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Top 4 List (Right - 4 cols) -->
+                <aside class="lg:col-span-4 flex flex-col space-y-4">
+                    <!-- Article Card 1 -->
+                    <div class="flex gap-4 group cursor-pointer border-b border-ui-border pb-4">
+                        <div class="w-1/3 aspect-square rounded-lg overflow-hidden shrink-0">
+                            <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="w-2/3 flex flex-col justify-center">
+                            <span class="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-1">Markets</span>
+                            <h3 class="font-bold text-ui-text text-sm leading-snug group-hover:text-brand-red transition-colors clamp-3">Sensex hits historic 85K milestone; Auto and IT stocks lead the morning rally</h3>
+                        </div>
+                    </div>
+                    <!-- Article Card 2 -->
+                    <div class="flex gap-4 group cursor-pointer border-b border-ui-border pb-4">
+                        <div class="w-1/3 aspect-square rounded-lg overflow-hidden shrink-0">
+                            <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="w-2/3 flex flex-col justify-center">
+                            <span class="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-1">Sports</span>
+                            <h3 class="font-bold text-ui-text text-sm leading-snug group-hover:text-brand-red transition-colors clamp-3">Neeraj Chopra announces new coaching team ahead of the World Athletics Championship</h3>
+                        </div>
+                    </div>
+                    <!-- Article Card 3 -->
+                    <div class="flex gap-4 group cursor-pointer border-b border-ui-border pb-4">
+                        <div class="w-1/3 aspect-square rounded-lg overflow-hidden shrink-0">
+                            <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="w-2/3 flex flex-col justify-center">
+                            <span class="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-1">Technology</span>
+                            <h3 class="font-bold text-ui-text text-sm leading-snug group-hover:text-brand-red transition-colors clamp-3">Major restructuring at OpenAI as core safety team members depart</h3>
+                        </div>
+                    </div>
+                    <!-- Timeline Card -->
+                    <div class="bg-ui-bg rounded-xl p-4 border border-ui-border">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-[10px] font-bold text-ui-text uppercase tracking-wide flex items-center">
+                                <i class="fas fa-stream text-brand-red mr-1.5"></i> Developing Story
+                            </h4>
+                        </div>
+                        <h3 class="font-bold text-ui-text text-sm mb-3 hover:text-brand-red cursor-pointer">Monsoon Fury: Red Alert in 3 States</h3>
+                        <div class="relative timeline-line space-y-3 pl-2">
+                            <div class="relative z-10 flex items-start">
+                                <div class="w-4 h-4 rounded-full bg-brand-red border-2 border-white flex items-center justify-center shrink-0 mt-0.5"><div class="w-1.5 h-1.5 bg-white rounded-full"></div></div>
+                                <div class="ml-2"><p class="text-xs font-bold text-ui-text">NDRF teams deployed in coastal areas</p></div>
+                            </div>
+                            <div class="relative z-10 flex items-start opacity-60">
+                                <div class="w-4 h-4 rounded-full bg-ui-border border-2 border-white shrink-0 mt-0.5"></div>
+                                <div class="ml-2"><p class="text-xs font-semibold text-ui-text">Schools shut in Mumbai</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- UX Section: Urge to Sign In -->
+        <section class="bg-gradient-to-r from-ui-text to-slate-800 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between shadow-float relative overflow-hidden">
+            <!-- Decorative BG -->
+            <div class="absolute -right-20 -top-20 opacity-10"><i class="fas fa-newspaper text-9xl text-white"></i></div>
+            
+            <div class="relative z-10 md:w-2/3 mb-6 md:mb-0">
+                <div class="inline-flex items-center space-x-1 bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded border border-white/10 mb-3 uppercase tracking-wider">
+                    <i class="fas fa-star text-yellow-400 mr-1"></i> Free Account
+                </div>
+                <h3 class="font-serif font-bold text-2xl sm:text-3xl text-white mb-2">Build your own "Morning Edition"</h3>
+                <p class="text-white/80 text-sm sm:text-base">Sign in to follow topics, save articles for later, and customize your news layout. No more clutter, just the news you care about.</p>
+            </div>
+            
+            <div class="relative z-10 flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <button class="bg-brand-red text-white font-bold py-3 px-6 rounded-xl hover:bg-brand-dark transition-colors shadow-sm whitespace-nowrap text-sm">
+                    Create Free Account
+                </button>
+                <button class="bg-white/10 text-white border border-white/20 font-bold py-3 px-6 rounded-xl hover:bg-white/20 transition-colors whitespace-nowrap text-sm">
+                    Sign In
+                </button>
+            </div>
+        </section>
+
+        <!-- CONTENT GROUPING: India & World -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            <!-- India News -->
+            <div>
+                <div class="flex items-center justify-between mb-4 border-b-2 border-ui-text pb-2">
+                    <h2 class="text-xl font-bold text-ui-text uppercase tracking-wide">India</h2>
+                    <a href="#" class="text-xs font-bold text-brand-red hover:underline">View All</a>
+                </div>
+                
+                <div class="space-y-5">
+                    <!-- Hero India Card -->
+                    <div class="group cursor-pointer">
+                        <div class="aspect-[16/9] rounded-xl overflow-hidden mb-3">
+                            <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <h3 class="font-bold text-lg text-ui-text leading-snug group-hover:text-brand-red transition-colors mb-2">Supreme Court issues new guidelines on environmental clearances for infrastructure projects</h3>
+                        <p class="text-sm text-ui-muted clamp-2 mb-2">The apex court emphasized the need to balance rapid infrastructure development with ecological sustainability, mandating stricter assessments.</p>
+                        <div class="text-xs font-semibold text-ui-muted">3 hours ago</div>
+                    </div>
+                    <hr class="border-ui-border">
+                    <!-- List India items -->
+                    <div class="grid grid-cols-1 gap-4">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Railways announces 50 new Vande Bharat routes connecting Tier-2 cities</h4>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Karnataka Assembly passes controversial bill amid walkout by opposition parties</h4>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Heatwave alert: IMD predicts extreme temperatures across Northern plains this week</h4>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Election Commission announces dates for upcoming municipal polls in three states</h4>
+                    </div>
+                    <button class="w-full py-3 mt-4 rounded-xl border border-ui-border text-ui-text font-bold text-sm hover:border-brand-red hover:text-brand-red transition-all flex items-center justify-center group">
+                        Load More India News <i class="fas fa-chevron-down ml-2 group-hover:translate-y-1 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- World News -->
+            <div>
+                <div class="flex items-center justify-between mb-4 border-b-2 border-ui-text pb-2">
+                    <h2 class="text-xl font-bold text-ui-text uppercase tracking-wide">World</h2>
+                    <a href="#" class="text-xs font-bold text-brand-red hover:underline">View All</a>
+                </div>
+                
+                <div class="space-y-5">
+                    <!-- Hero World Card -->
+                    <div class="group cursor-pointer">
+                        <div class="aspect-[16/9] rounded-xl overflow-hidden mb-3">
+                            <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <h3 class="font-bold text-lg text-ui-text leading-snug group-hover:text-brand-red transition-colors mb-2">G20 Summit Concludes: Nations agree on universal framework for AI regulation</h3>
+                        <p class="text-sm text-ui-muted clamp-2 mb-2">Leaders signed a historic accord aimed at standardizing AI safety protocols without stifling innovation in the tech sector.</p>
+                        <div class="text-xs font-semibold text-ui-muted">5 hours ago</div>
+                    </div>
+                    <hr class="border-ui-border">
+                    <!-- List World items -->
+                    <div class="grid grid-cols-1 gap-4">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">European Central Bank cuts interest rates by 25 basis points as inflation cools</h4>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">SpaceX successfully docks Starship with commercial space station prototype</h4>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">UN Security Council calls for emergency session regarding escalating maritime disputes</h4>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Japan unveils new visa program targeting highly skilled tech professionals</h4>
+                    </div>
+                    <button class="w-full py-3 mt-4 rounded-xl border border-ui-border text-ui-text font-bold text-sm hover:border-brand-red hover:text-brand-red transition-all flex items-center justify-center group">
+                        Load More World News <i class="fas fa-chevron-down ml-2 group-hover:translate-y-1 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- THE DIGITAL MORNING EDITION (The "Just a section" Newspaper look) -->
+    <section class="newspaper-section border-y-8 border-paper-ink w-full pt-16 pb-8 my-8 relative shadow-inner bg-[#F4EFDF]">
+        <div class="max-w-[1440px] mx-auto px-4 lg:px-8">
+            
+            <!-- Section Masthead -->
+            <div class="text-center border-b-4 border-paper-ink pb-6 mb-8 relative">
+                <!-- Decorative Date line -->
+                <div class="absolute left-0 top-1/2 transform -translate-y-1/2 text-left hidden lg:block border-l-4 border-paper-ink pl-4">
+                    <div class="font-serif font-bold text-paper-ink text-xl">Vol. CXXIII</div>
+                    <div class="font-sans text-xs uppercase tracking-widest text-paper-ink/70">Printed in New Delhi</div>
+                </div>
+
+                <div class="text-brand-red font-bold text-xs tracking-widest uppercase mb-3 flex items-center justify-center space-x-2 font-sans opacity-0 animate-stamp" style="animation-delay: 0.2s;">
+                    <span>Exclusive Editorial</span>
+                    <span class="h-1.5 w-1.5 bg-brand-red rounded-full"></span>
+                    <span>Weekend Reading</span>
+                </div>
+                <h2 class="font-serif font-black text-5xl sm:text-7xl tracking-tight leading-none text-paper-ink transition-transform hover:scale-105 duration-500 cursor-default">
+                    The Sunday Read
+                </h2>
+                <div class="text-sm font-medium text-paper-ink/60 mt-4 uppercase tracking-widest border-t border-paper-ink/20 pt-2 inline-block px-12 font-sans">
+                    Curated Long-form, Culture & Leisure
+                </div>
+            </div>
+
+            <!-- Classifieds Ticker -->
+            <div class="w-full border-y-2 border-paper-ink py-1.5 mb-8 bg-white/50 flex overflow-hidden font-sans text-xs uppercase font-bold text-paper-ink/80 tracking-widest">
+                <div class="border-r-2 border-paper-ink px-4 bg-paper-ink text-[#F4EFDF] flex-shrink-0">Classifieds</div>
+                <div class="flex whitespace-nowrap overflow-hidden w-full pl-4 items-center">
+                    <div class="animate-marquee inline-block">
+                        <span class="mx-4"><span class="text-brand-red">WANTED:</span> Front-end developer with a passion for 90s aesthetics. Must know CSS.</span> •
+                        <span class="mx-4"><span class="text-brand-red">LOST:</span> One attention span. Last seen scrolling short-form video app. Reward if found.</span> •
+                        <span class="mx-4"><span class="text-brand-red">FOR SALE:</span> Vintage typewriter. Only used to type angry letters to the editor.</span> •
+                        <span class="mx-4"><span class="text-brand-red">MATRIMONIAL:</span> Seeking reader who prefers long-form journalism over 280-character hot takes.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+                <!-- Main Feature (7 cols) -->
+                <div class="lg:col-span-7 lg:border-r border-paper-ink/30 lg:pr-8">
+                    <h3 class="font-serif font-black text-4xl sm:text-5xl leading-tight mb-4 text-paper-ink hover:text-brand-red transition-colors cursor-pointer mix-blend-multiply">
+                        The Lost Art of Waiting: How Instant Delivery Changed Our Psychology
+                    </h3>
+                    <h4 class="font-serif italic text-2xl text-paper-ink/70 mb-6 border-l-4 border-paper-ink pl-4">
+                        We can get groceries in 10 minutes and lovers with a swipe. But neuroscientists argue that the elimination of anticipation is altering our brain chemistry.
+                    </h4>
+                    
+                    <div class="flex items-center justify-between text-xs font-bold text-paper-ink uppercase tracking-widest border-y border-paper-ink/20 py-2 mb-6 font-sans">
+                        <span>By Dr. Ananya Sharma</span>
+                        <span>12 Min Read • Pg. 4</span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-6 mb-8">
+                        <div class="w-full sm:w-1/2 aspect-[3/4] border border-paper-ink p-1 bg-white mb-4 sm:mb-0 group cursor-pointer shadow-[6px_6px_0px_rgba(26,22,20,0.1)] hover:shadow-[2px_2px_0px_rgba(26,22,20,0.8)] transition-all">
+                            <img src="https://images.unsplash.com/photo-1510172951991-856a654063f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Vintage Clock" class="w-full h-full object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700">
+                            <div class="text-[9px] text-right font-sans mt-1 text-paper-ink/80 font-bold uppercase">FILE PHOTO / TIMES ARCHIVES</div>
+                        </div>
+                        <div class="w-full sm:w-1/2">
+                            <p class="text-base leading-relaxed text-paper-ink font-serif drop-cap">
+                                There was a time, not so long ago, when waiting was a structured part of the human experience. You waited for the postman, you waited for your favorite song to play on the radio, and you waited for the Sunday paper to arrive to solve the crossword. 
+                            </p>
+                            <p class="text-base leading-relaxed text-paper-ink font-serif mt-4">
+                                Today, algorithms have eradicated the pause. The '10-minute delivery' wars have conditioned us to view any delay as a service failure rather than a natural state of living. This immediate gratification cycle, researchers note, is severely depleting our dopamine reserves.
+                            </p>
+                            <button class="mt-6 border-b-2 border-paper-ink font-bold text-sm uppercase tracking-widest hover:text-brand-red hover:border-brand-red transition-colors pb-1">Read Full Story →</button>
+                        </div>
+                    </div>
+
+                    <!-- Emotional Engagement CTA -->
+                    <div class="coupon-border mt-8 group cursor-pointer shadow-[8px_8px_0px_rgba(26,22,20,1)] hover:translate-y-1 hover:shadow-[4px_4px_0px_rgba(26,22,20,1)] transition-all bg-white relative">
+                        <div class="bg-white border-2 border-paper-ink p-6 lg:p-8 relative z-10 flex flex-col md:flex-row items-center justify-between hover-ink-fill transition-colors duration-500">
+                            <div class="md:w-2/3 mb-4 md:mb-0">
+                                <div class="inline-block bg-brand-red text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1 mb-3">Reader's Privilege</div>
+                                <h4 class="font-serif font-black text-2xl md:text-3xl mb-2">Miss the smell of fresh newsprint?</h4>
+                                <p class="font-sans text-sm font-medium opacity-80">Subscribe to our Digital Weekend Edition. Curated deep-dives, nostalgic puzzles, and clutter-free reading delivered every Sunday morning.</p>
+                            </div>
+                            <div class="md:w-1/3 flex justify-end">
+                                <span class="border-2 border-current px-6 py-3 font-sans font-bold uppercase tracking-widest text-sm bg-transparent group-hover:bg-white group-hover:text-paper-ink transition-colors">Subscribe Now</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Newspaper Sidebar (5 cols) -->
+                <div class="lg:col-span-5 flex flex-col space-y-8">
+                    
+                    <!-- The Fun Page (Moved here and restyled) -->
+                    <div class="border-t-4 border-b-4 border-paper-ink py-4">
+                        <h4 class="font-serif font-black text-2xl text-paper-ink mb-4 text-center border-b border-paper-ink/30 pb-2">Page 12: Fun & Leisure</h4>
+                        
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- Crossword -->
+                            <div class="flex flex-col items-center cursor-pointer group">
+                                <h5 class="font-sans text-xs font-bold uppercase tracking-widest mb-3 text-paper-ink">Mini Crossword</h5>
+                                <div class="grid grid-cols-5 gap-[1px] bg-paper-ink p-[1px] w-full max-w-[140px] aspect-square shadow-[4px_4px_0px_rgba(26,22,20,0.2)]">
+                                    <div class="bg-[#F4EFDF]"></div><div class="bg-[#F4EFDF]"></div><div class="bg-white flex items-center justify-center font-serif font-bold">T</div><div class="bg-paper-ink"></div><div class="bg-[#F4EFDF]"></div>
+                                    <div class="bg-paper-ink"></div><div class="bg-white flex items-center justify-center font-serif font-bold">A</div><div class="bg-white flex items-center justify-center font-serif font-bold">I</div><div class="bg-[#F4EFDF]"></div><div class="bg-[#F4EFDF]"></div>
+                                    <div class="bg-[#F4EFDF]"></div><div class="bg-[#F4EFDF]"></div><div class="bg-white flex items-center justify-center font-serif font-bold">M</div><div class="bg-paper-ink"></div><div class="bg-[#F4EFDF]"></div>
+                                    <div class="bg-white flex items-center justify-center font-serif font-bold text-brand-red">R</div><div class="bg-white flex items-center justify-center font-serif font-bold text-brand-red">B</div><div class="bg-white flex items-center justify-center font-serif font-bold text-brand-red">I</div><div class="bg-paper-ink"></div><div class="bg-paper-ink"></div>
+                                    <div class="bg-[#F4EFDF]"></div><div class="bg-paper-ink"></div><div class="bg-[#F4EFDF]"></div><div class="bg-[#F4EFDF]"></div><div class="bg-[#F4EFDF]"></div>
+                                </div>
+                                <p class="text-[10px] text-center font-serif italic mt-3 opacity-80 group-hover:text-brand-red">4 Across: Apex bank (3)</p>
+                            </div>
+
+                            <!-- Wordle / Daily Comic -->
+                            <div class="flex flex-col justify-between">
+                                <!-- Spell the news -->
+                                <div class="border border-paper-ink p-3 mb-4 bg-white shadow-[2px_2px_0px_rgba(26,22,20,0.1)] hover:bg-paper-ink hover:text-white transition-colors cursor-pointer group">
+                                    <h5 class="font-sans text-[10px] font-bold uppercase tracking-widest mb-2">Spell The News</h5>
+                                    <div class="flex space-x-1 justify-center mb-1">
+                                        <div class="w-6 h-6 border border-current flex items-center justify-center font-serif font-bold text-xs">P</div>
+                                        <div class="w-6 h-6 border border-current flex items-center justify-center font-serif font-bold text-xs bg-brand-red text-white">O</div>
+                                        <div class="w-6 h-6 border border-current flex items-center justify-center font-serif font-bold text-xs">L</div>
+                                        <div class="w-6 h-6 border border-current flex items-center justify-center font-serif font-bold text-xs">L</div>
+                                    </div>
+                                    <div class="text-[9px] text-center opacity-70 group-hover:opacity-100">4 Letters, 6 Tries</div>
+                                </div>
+                                
+                                <!-- Agony Aunt / Dear Editor (Gemini Interactive) -->
+                                <div class="border-l-2 border-paper-ink pl-3 relative flex-grow flex flex-col">
+                                    <h5 class="font-sans text-xs font-bold uppercase tracking-widest mb-1 text-brand-red">Ask The Editor</h5>
+                                    <div id="editor-chat-area" class="flex-grow flex flex-col justify-end mb-2 min-h-[60px]">
+                                        <p class="font-serif italic text-xs leading-tight opacity-80">Have a modern dilemma? Ask our vintage editor for some pragmatic wisdom.</p>
+                                    </div>
+                                    <div class="flex gap-1 mt-auto border-t border-paper-ink/20 pt-2">
+                                        <input type="text" id="editor-input" placeholder="E.g., I scroll too much..." class="w-full bg-transparent border-b border-paper-ink/50 text-[10px] font-sans focus:outline-none focus:border-brand-red placeholder:opacity-50 pb-1 text-paper-ink">
+                                        <button id="editor-ask-btn" class="text-[10px] font-bold uppercase tracking-widest hover:text-brand-red shrink-0 border border-paper-ink px-2 py-0.5 transition-colors hover:bg-paper-ink hover:text-white">Ask</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Editorial Cartoon -->
+                    <div class="border-2 border-paper-ink p-2 bg-white shadow-[6px_6px_0px_rgba(26,22,20,1)] relative group cursor-pointer">
+                        <div class="absolute -top-3 -left-3 bg-brand-red text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest transform -rotate-6 shadow-sm">Today's Cartoon</div>
+                        <img src="https://images.unsplash.com/photo-1581404179378-0056637e1c12?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Cartoon style image" class="w-full aspect-[4/3] object-cover filter grayscale sepia-[0.2] border border-paper-ink/20 group-hover:sepia-0 transition-all">
+                        <p class="text-center font-serif italic text-xs mt-2 text-paper-ink">"The digital footprint grows heavier."</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 space-y-12 mb-16">
+        
+        <!-- CONTENT GROUPING: Business, Tech & Entertainment -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Business -->
+            <div class="col-span-1">
+                <div class="flex items-center justify-between mb-4 border-b-2 border-ui-text pb-2">
+                    <h2 class="text-xl font-bold text-ui-text uppercase tracking-wide">Business</h2>
+                </div>
+                <div class="space-y-4">
+                    <!-- Mini Market Tracker -->
+                    <div class="bg-ui-bg border border-ui-border p-3 rounded-xl flex justify-between items-center mb-4">
+                        <div>
+                            <div class="text-xs font-bold text-ui-text">NIFTY 50</div>
+                            <div class="font-bold text-green-600">25,840.10</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded">▲ +0.45%</div>
+                        </div>
+                    </div>
+                    <!-- Articles -->
+                    <div class="group cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full aspect-video object-cover rounded-xl mb-3">
+                        <h4 class="font-bold text-ui-text text-sm hover:text-brand-red">RBI leaves repo rate unchanged at 6.5%, maintains 'withdrawal of accommodation' stance</h4>
+                    </div>
+                    <hr class="border-ui-border">
+                    <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">FMCG sector sees volume growth recovery in rural markets post-monsoon</h4>
+                    <hr class="border-ui-border">
+                    <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Tata Motors to launch three new electric vehicles in the sub-15 lakh segment</h4>
+                    <hr class="border-ui-border">
+                    <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Startup funding in India rebounds, edtech and AI sectors see massive inflows Q3</h4>
+                    
+                    <button class="w-full py-2 mt-2 rounded-lg bg-ui-bg text-ui-text font-bold text-xs hover:bg-ui-border transition-colors">
+                        More in Business
+                    </button>
+                </div>
+            </div>
+
+            <!-- Technology -->
+            <div class="col-span-1">
+                <div class="flex items-center justify-between mb-4 border-b-2 border-ui-text pb-2">
+                    <h2 class="text-xl font-bold text-ui-text uppercase tracking-wide">Tech</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="group cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full aspect-video object-cover rounded-xl mb-3">
+                        <h4 class="font-bold text-ui-text text-sm hover:text-brand-red">Apple's upcoming iPhone 18 tipped to feature completely edge-to-edge display</h4>
+                    </div>
+                    <hr class="border-ui-border">
+                    <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Google rolls out 'Gemini Advanced' to all workspace users globally</h4>
+                    <hr class="border-ui-border">
+                    <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Cybersecurity alert: Millions of routers vulnerable to new zero-day exploit</h4>
+                    <hr class="border-ui-border">
+                    <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">India's indigenous quantum computer prototype achieves operational stability</h4>
+                    
+                    <button class="w-full py-2 mt-2 rounded-lg bg-ui-bg text-ui-text font-bold text-xs hover:bg-ui-border transition-colors">
+                        More in Tech
+                    </button>
+                </div>
+            </div>
+
+            <!-- Entertainment (Zoom style) -->
+            <div class="col-span-1 bg-brand-light rounded-2xl p-5 border border-brand-red/10 h-full">
+                <div class="flex items-center justify-between mb-4 border-b-2 border-brand-zoom pb-2">
+                    <h2 class="text-xl font-black text-brand-zoom tracking-tight">ZOOM <span class="font-normal text-sm text-ui-text">Entertainment</span></h2>
+                </div>
+                <div class="space-y-5">
+                    <div class="group cursor-pointer relative overflow-hidden rounded-xl aspect-[4/3]">
+                        <img src="https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                        <h4 class="absolute bottom-4 left-4 right-4 font-bold text-white text-sm">Bollywood box office: Action thriller crosses ₹300 crore mark globally in first weekend</h4>
+                    </div>
+                    <div class="flex gap-3 group cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1603190287605-e6ade32fa852?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-20 h-20 object-cover rounded-lg shrink-0">
+                        <h4 class="font-bold text-ui-text text-sm hover:text-brand-zoom leading-tight">Cannes 2026: Indian celebrities making waves on the red carpet</h4>
+                    </div>
+                    <div class="flex gap-3 group cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="w-20 h-20 object-cover rounded-lg shrink-0">
+                        <h4 class="font-bold text-ui-text text-sm hover:text-brand-zoom leading-tight">Global music festival lineup announced; major pop icons to perform in Mumbai</h4>
+                    </div>
+                    <div class="flex gap-3 group cursor-pointer border-t border-brand-red/10 pt-4">
+                        <h4 class="font-bold text-ui-text text-sm hover:text-brand-zoom leading-tight"><span class="text-brand-zoom mr-1">► Watch:</span> Exclusive interview with the cast of the year's biggest sci-fi web series</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENT GROUPING: Sports & Opinion (Replaced Fun Games) -->
+        <section class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- Sports (3 cols) -->
+            <div class="lg:col-span-3">
+                <div class="flex items-center justify-between mb-4 border-b-2 border-ui-text pb-2">
+                    <h2 class="text-xl font-bold text-ui-text uppercase tracking-wide">Sports</h2>
+                    <a href="#" class="text-xs font-bold text-brand-red hover:underline">Full Coverage</a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 group cursor-pointer">
+                        <div class="aspect-[16/9] rounded-xl overflow-hidden mb-3">
+                            <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <span class="text-[10px] font-bold text-brand-red uppercase tracking-wider mb-1 block">Cricket</span>
+                        <h3 class="font-bold text-2xl text-ui-text leading-snug group-hover:text-brand-red transition-colors mb-2">Border-Gavaskar Trophy: India aims for hat-trick of series wins Down Under as first test begins</h3>
+                        <p class="text-ui-muted text-sm clamp-2 mt-2">Captain Rohit Sharma expressed confidence in the squad's preparation despite late injury concerns to key fast bowlers ahead of the crucial Perth test.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <!-- Score widget -->
+                        <div class="bg-ui-text text-white p-4 rounded-xl shadow-inner">
+                            <div class="flex justify-between items-center text-xs font-bold text-white/50 mb-2 uppercase tracking-wide">
+                                <span>1st Test, Day 1</span>
+                                <span class="text-brand-red flex items-center"><span class="w-1.5 h-1.5 bg-brand-red rounded-full live-indicator mr-1.5"></span> Live</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-lg">IND</span>
+                                <span class="font-bold text-lg">245/4</span>
+                            </div>
+                            <div class="flex justify-between items-center text-white/70 mb-3">
+                                <span>AUS</span>
+                                <span>Yet to bat</span>
+                            </div>
+                            <div class="text-xs text-white/90">Kohli 78* • Pant 45* (82.1 overs)</div>
+                        </div>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Premier League: Arsenal secures late winner against Manchester City in title clash</h4>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">Wimbledon prepares for transition year as legends hint at retirement</h4>
+                        <hr class="border-ui-border">
+                        <h4 class="font-bold text-sm text-ui-text hover:text-brand-red cursor-pointer">F1: Max Verstappen dominates qualifying session at Monza</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opinion & Voices (Replaces Fun & Games) -->
+            <div class="lg:col-span-1 bg-ui-bg border-t-4 border-ui-text p-5 flex flex-col">
+                <div class="w-full flex items-center justify-between mb-4 border-b border-ui-border pb-2">
+                    <h2 class="text-lg font-bold text-ui-text uppercase tracking-wide">
+                        Voices & Opinion
+                    </h2>
+                </div>
+
+                <div class="space-y-6 flex-grow">
+                    <!-- Opinion Column 1 -->
+                    <div class="group cursor-pointer">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Author" class="w-8 h-8 rounded-full grayscale group-hover:grayscale-0 transition-all">
+                            <span class="text-xs font-bold uppercase tracking-wider text-ui-muted">Vikram Singh</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-lg leading-snug group-hover:text-brand-red transition-colors">The middle class trap in the new tax regime</h3>
+                    </div>
+                    
+                    <hr class="border-ui-border">
+                    
+                    <!-- Opinion Column 2 -->
+                    <div class="group cursor-pointer">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Author" class="w-8 h-8 rounded-full grayscale group-hover:grayscale-0 transition-all">
+                            <span class="text-xs font-bold uppercase tracking-wider text-ui-muted">Priya Desai</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-lg leading-snug group-hover:text-brand-red transition-colors">Why our cities are failing the climate resilience test</h3>
+                    </div>
+
+                    <hr class="border-ui-border">
+
+                    <!-- Opinion Column 3 -->
+                    <div class="group cursor-pointer">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-brand-red text-white flex items-center justify-center font-bold text-xs">TN</div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-red">Editorial</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-lg leading-snug group-hover:text-brand-red transition-colors">A necessary pivot in our foreign policy strategy</h3>
+                    </div>
+                </div>
+                
+                <button class="mt-6 w-full border border-ui-text text-ui-text font-bold text-xs py-2 uppercase tracking-widest hover:bg-ui-text hover:text-white transition-colors">Read All Opinions</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-ui-text text-white pt-16 pb-8 border-t-4 border-brand-red">
+        <div class="max-w-[1440px] mx-auto px-4 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12 border-b border-white/10 pb-12">
+                <div class="col-span-2 lg:col-span-2 pr-8">
+                    <a href="#" class="font-bold text-4xl tracking-tighter text-white block mb-6">
+                        TIMES<span class="text-brand-red">NOW</span>
+                    </a>
+                    <p class="text-ui-muted text-sm mb-6 max-w-sm">
+                        India's premium digital news destination. Delivering speed, accuracy, and depth through cutting-edge journalism and modern technology.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-red transition-colors"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-red transition-colors"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-red transition-colors"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-red transition-colors"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold uppercase tracking-wider text-xs text-white/50 mb-4">Sections</h4>
+                    <ul class="space-y-3 text-sm font-medium">
+                        <li><a href="#" class="hover:text-brand-red transition-colors">India</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">World</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Business & Tech</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Sports</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Entertainment</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold uppercase tracking-wider text-xs text-white/50 mb-4">Features</h4>
+                    <ul class="space-y-3 text-sm font-medium">
+                        <li><a href="#" class="hover:text-brand-red transition-colors flex items-center">Live TV <span class="w-1.5 h-1.5 bg-brand-red rounded-full ml-2"></span></a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Visual Stories</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Interactive Data</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">The Sunday Read</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Games & Puzzles</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold uppercase tracking-wider text-xs text-white/50 mb-4">Company</h4>
+                    <ul class="space-y-3 text-sm font-medium">
+                        <li><a href="#" class="hover:text-brand-red transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Contact Editors</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-brand-red transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center text-xs text-ui-muted font-medium">
+                <p>&copy; 2026 Times Internet Limited. All rights reserved.</p>
+                <div class="mt-4 md:mt-0 flex space-x-6">
+                    <span>Designed for Modern Web</span>
+                    <a href="#" class="hover:text-white">Download the App</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Gemini API Scripts -->
+    <script>
+        // Feature 1: Live AI Summary with Search Grounding
+        const summaryBtn = document.getElementById('generate-summary-btn');
+        const summaryList = document.getElementById('ai-summary-list');
+        const leadHeadline = document.getElementById('lead-headline').innerText;
+
+        summaryBtn.addEventListener('click', async (e) => {
+            e.stopPropagation(); // Prevent card click
+            
+            // UI Loading State
+            summaryBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5 text-yellow-300"></i> Working...';
+            summaryBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            summaryBtn.disabled = true;
+            summaryList.innerHTML = '<li class="text-sm text-ui-muted italic flex items-center h-full"><i class="fas fa-robot mr-2"></i> Fetching live context and synthesizing key points...</li>';
+
+            const apiKey = ""; // Canvas handles this automatically
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            // We instruct it to return raw HTML <li> tags for easy insertion, and use Google Search for grounding.
+            const payload = {
+                contents: [{ parts: [{ text: `Act as a senior news editor. Look up the latest real-world news regarding: "${leadHeadline}". Provide exactly 3 short, punchy bullet points summarizing the key takeaways or latest developments. Format the output strictly as HTML <li> elements (e.g., <li>Point 1</li><li>Point 2</li>). Do not include <ul> tags, markdown block backticks, or citations like [1].` }] }],
+                tools: [{ "google_search": {} }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates[0].content) {
+                    let htmlList = result.candidates[0].content.parts[0].text;
+                    // Clean up potential markdown formatting if the model disobeys
+                    htmlList = htmlList.replace(/```html/g, '').replace(/```/g, '').trim();
+                    
+                    // Add styling to the generated <li> elements
+                    const styledList = htmlList.replace(/<li>/g, '<li class="flex items-start"><div class="w-1.5 h-1.5 bg-brand-red rounded-full mt-1.5 mr-2 shrink-0"></div> <span class="flex-1">').replace(/<\/li>/g, '</span></li>');
+                    
+                    summaryList.innerHTML = styledList;
+                    summaryBtn.innerHTML = '<i class="fas fa-check text-green-400 mr-1.5"></i> Updated';
+                }
+            } catch (error) {
+                console.error("Summary Generation Error:", error);
+                summaryList.innerHTML = '<li class="text-sm text-brand-red font-medium">Failed to connect to the news desk. Please try again.</li>';
+                summaryBtn.innerHTML = '<i class="fas fa-redo mr-1.5"></i> Retry';
+                summaryBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                summaryBtn.disabled = false;
+            }
+        });
+
+        // Feature 2: Interactive "Ask The Editor"
+        const editorBtn = document.getElementById('editor-ask-btn');
+        const editorInput = document.getElementById('editor-input');
+        const editorChat = document.getElementById('editor-chat-area');
+
+        // Allow pressing Enter to submit
+        editorInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                editorBtn.click();
+            }
+        });
+
+        editorBtn.addEventListener('click', async () => {
+            const question = editorInput.value.trim();
+            if (!question) return;
+
+            // Update UI to loading state
+            editorChat.innerHTML = `
+                <div class="bg-[#F4EFDF] p-2 mb-2 rounded border border-paper-ink/10 shadow-inner">
+                    <p class="font-sans text-[10px] font-bold text-brand-red mb-1 uppercase tracking-wider">You asked:</p>
+                    <p class="font-serif text-xs leading-tight opacity-90">${question}</p>
+                </div>
+                <p class="font-serif italic text-xs leading-tight text-paper-ink/60 mt-auto flex items-center">
+                    <i class="fas fa-pen-nib animate-bounce mr-2"></i> The Editor is typing...
+                </p>`;
+            editorInput.value = '';
+            editorBtn.disabled = true;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: `Act as a cynical but wise, chain-smoking newspaper editor from a 1990s Indian broadsheet. A reader asks you: "${question}". Respond in exactly 2 short, witty sentences. Give pragmatic, slightly nostalgic advice. Do not use emojis.` }] }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates[0].content) {
+                    const answer = result.candidates[0].content.parts[0].text;
+                    editorChat.innerHTML = `
+                        <div class="bg-[#F4EFDF] p-2 mb-2 rounded border border-paper-ink/10 shadow-inner">
+                            <p class="font-sans text-[10px] font-bold text-brand-red mb-1 uppercase tracking-wider">You asked:</p>
+                            <p class="font-serif text-xs leading-tight opacity-90 mb-2">${question}</p>
+                            <p class="font-sans text-[10px] font-bold text-paper-ink mb-1 uppercase tracking-wider border-t border-paper-ink/10 pt-2">Editor's Reply:</p>
+                            <p class="font-serif italic text-xs leading-tight text-paper-ink font-semibold">"${answer}"</p>
+                        </div>`;
+                }
+            } catch (error) {
+                console.error("Editor Chat Error:", error);
+                editorChat.innerHTML = `<p class="font-serif italic text-xs leading-tight text-brand-red">The editor is currently on a chai break. Come back later.</p>`;
+            } finally {
+                editorBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
